@@ -21,9 +21,14 @@ is_mouse_clicked = False
 xs = []
 ys = []
 
+def save_coords():
+    with open("coords.txt", "w") as f:
+        for i in range(len(xs)): f.write(str(xs[i]) + "," + str(ys[i]) + "\n")
+
 def onrelease(event):
     global is_mouse_clicked
     is_mouse_clicked = False
+    save_coords()
 
 def onmovement(event):
     if is_mouse_clicked:
