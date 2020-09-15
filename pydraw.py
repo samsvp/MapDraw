@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 import json
 import matplotlib.pyplot as plt
+
 
 with open("data/map.json") as data:
     map_data = json.load(data)
