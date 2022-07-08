@@ -8,20 +8,36 @@ is_mouse_clicked = False
 map_data = None
 xs = []
 ys = []
+zs = [] # altitude
+key_buffer = ""
+cur_altitude = 5
+
 
 def load_json(my_json="data/gremio_map.json"):
     global map_data
     with open(my_json) as data:
         map_data = json.load(data)
 
-def plot_map():
+
+def get_color(altitude):
+    """
+    Returns a RGB color value for the given altitude
+    """
+    r = 0
+    g = 0.8
+    b = altitude / 15
+    if b > 1: b = 1
+    return (r, g, b)
+
+
+def plot_map(reset=False):
     global ax
     
-    ax.clear()
+    if reset: ax.clear()
     
     my_map = plt.imread(map_data["map_name"])
     
-    ax.set_title('Map')
+    ax.set_title("Map Altitude = " + str(cur_altitude))
     ax.set_xlim(map_data["x_min"], map_data["x_max"])
     ax.set_ylim(map_data["y_min"], map_data["y_max"])
 
@@ -29,17 +45,20 @@ def plot_map():
 
     ax.imshow(my_map, zorder=0, extent=BBox, aspect='equal')
 
-# Events
 
+# Events
 def save_coords():
     with open("coords.txt", "w") as f:
-        for i in range(len(xs)): f.write(str(xs[i]) + "," + str(ys[i]) + "\n")
+        for i in range(len(xs)): 
+            f.write(str(xs[i]) + "," + str(ys[i]) + "," + str(zs[i]) + "\n")
+
 
 def onrelease(event):
     global is_mouse_clicked, ax
     is_mouse_clicked = False
     save_coords()
     plot_map()
+
 
 def onmovement(event):
     if is_mouse_clicked:
@@ -48,16 +67,43 @@ def onmovement(event):
         if x is None or y is None: return
         xs.append(x)
         ys.append(y)
-        plt.plot(x, y, ',', marker='o')
+        zs.append(cur_altitude)
+        
+        plt.plot(x, y, ',', marker='o', color=get_color(cur_altitude))
         if len(xs) < 2: return
-        plt.plot((xs[-2], xs[-1]), (ys[-2], ys[-1]), linestyle='--')
+        plt.plot((xs[-2], xs[-1]), (ys[-2], ys[-1]), linestyle='--', color=get_color(cur_altitude))
         fig.canvas.draw()
 
-def onclick(event):
-    global is_mouse_clicked, xs, ys
+
+def on_press(event):
+    """
+    Listens to keyboard to change altitude
+    """
+    global key_buffer, xs, ys, zs, ax, fig, cur_altitude
     
-    xs = []
-    ys = []
+    print(event.key)
+    if event.key in "1234567890":
+        key_buffer += event.key
+    elif event.key == "enter" and len(key_buffer) > 0:
+        ax.set_title("Map Altitude = " + key_buffer)
+        # set altitude to the value of the buffer and clear buffer
+        cur_altitude = int(key_buffer)
+        key_buffer = ""
+    # remove last element of the buffer
+    elif event.key == "backspace" and len(key_buffer) > 0:
+        key_buffer = key_buffer[:-1]
+    elif event.key == "escape":
+        xs, ys, zs = [], [], []
+        plot_map(True)
+    else: return
+    
+    fig.canvas.draw()
+        
+
+
+def onclick(event):
+    global is_mouse_clicked
+    
     is_mouse_clicked = True
 
 
@@ -66,6 +112,8 @@ fig, ax = plt.subplots()
 fig.canvas.mpl_connect('button_press_event', onclick)
 fig.canvas.mpl_connect('button_release_event', onrelease)
 fig.canvas.mpl_connect('motion_notify_event', onmovement)
+fig.canvas.mpl_connect('key_press_event', on_press)
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 2: 
