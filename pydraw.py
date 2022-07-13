@@ -3,7 +3,9 @@ from __future__ import print_function
 import sys
 import json
 import matplotlib.pyplot as plt
+from matplotlib.backend_bases import MouseEvent, KeyEvent
 
+from typing import *
 from getpointGPS import save_gps
 
 
@@ -16,13 +18,13 @@ key_buffer = ""
 cur_altitude = 5
 
 
-def load_json(my_json="data/gremio_map.json"):
+def load_json(my_json="data/gremio_map.json") -> None:
     global map_data
     with open(my_json) as data:
         map_data = json.load(data)
 
 
-def get_color(altitude):
+def get_color(altitude: float) -> Tuple[float, float, float]:
     """
     Returns a RGB color value for the given altitude
     """
@@ -33,7 +35,7 @@ def get_color(altitude):
     return (r, g, b)
 
 
-def plot_map(reset=False):
+def plot_map(reset=False) -> None:
     global ax
     
     if reset: ax.clear()
@@ -50,13 +52,13 @@ def plot_map(reset=False):
 
 
 # Events
-def save_coords():
+def save_coords() -> None:
     with open("coords.txt", "w") as f:
         for i in range(len(xs)): 
             f.write(str(xs[i]) + "," + str(ys[i]) + "," + str(zs[i]) + "\n")
 
 
-def onrelease(event):
+def onrelease(event: MouseEvent) -> None:
     global is_mouse_clicked, ax
     is_mouse_clicked = False
     save_coords()
@@ -64,7 +66,7 @@ def onrelease(event):
     plot_map()
 
 
-def onmovement(event):
+def onmovement(event: MouseEvent) -> None:
     if is_mouse_clicked:
         x = event.xdata
         y = event.ydata
@@ -79,7 +81,7 @@ def onmovement(event):
         fig.canvas.draw()
 
 
-def on_press(event):
+def on_press(event: KeyEvent) -> None:
     """
     Listens to keyboard to change altitude
     """
@@ -105,7 +107,7 @@ def on_press(event):
         
 
 
-def onclick(event):
+def onclick(event: MouseEvent) -> None:
     global is_mouse_clicked
     
     is_mouse_clicked = True

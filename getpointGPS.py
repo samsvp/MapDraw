@@ -6,7 +6,7 @@ import pymap3d as pm
 from numpy import linalg as LA
 
 
-def save_gps():
+def save_gps() -> None:
     with open("coords.txt") as f:
         data = f.readlines()
 
