@@ -4,6 +4,9 @@ import sys
 import json
 import matplotlib.pyplot as plt
 
+from getpointGPS import save_gps
+
+
 is_mouse_clicked = False
 map_data = None
 xs = []
@@ -57,6 +60,7 @@ def onrelease(event):
     global is_mouse_clicked, ax
     is_mouse_clicked = False
     save_coords()
+    save_gps()
     plot_map()
 
 
