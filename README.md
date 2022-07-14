@@ -27,8 +27,11 @@ Your map should appear on the screen. You can draw points by clicking and draggi
 Once the mouse is released a coords.txt file will be created with the latidude and longitude data. If you wish
 to draw a new trajectory follow the same steps previously described. Note that your last coordinates will disappear
 and that the coords file will be overwritten.
-If you do not specify a map then a default map will be loaded. If you specify more than one map json file then an exception
-will be raised.
+If you do not specify a map then a default map will be loaded. If you specify more than one map json file then an exception will be raised.
+
+## Controls
+Type the altitude with the keyboard and press enter to register it. You should see the current altitude as the map
+title. Press `esc` to clear the screen. Press `backspace` to delete the last typed number.
 
 # Adding new maps
 To add a new map create a new json file and add it and its correspondent image inside to the data folder. The json should be formated as follows:
